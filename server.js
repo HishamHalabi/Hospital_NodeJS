@@ -8,8 +8,8 @@ const bodyParser = require('body-parser');
 const app = express();
 
 
-// Always use hardcoded MongoDB credentials
-const uri = "mongodb+srv://01210288775ham:3DH8lLJcIK7Q72zA@hospital.sp5kfiq.mongodb.net/?retryWrites=true&w=majority&appName=Hospital";
+// Username is not real
+const uri = "mongodb+srv://ssssssss:3DH8lLJcIK7Q72zA@hospital.sp5kfiq.mongodb.net/?retryWrites=true&w=majority&appName=Hospital";
 
 mongoose.connect(uri)
   .then(() => {
