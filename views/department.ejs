@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Departments</title>
+
+  <style>
+    body {
+      background: linear-gradient(to right, #fbc2eb, #a6c1ee);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .departments-container {
+      max-width: 1000px;
+      margin: 4rem auto;
+      padding: 2rem;
+      background: #ffffffdd;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(8px);
+    }
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 2rem;
+    }
+
+    .create-btn {
+      display: block;
+      width: fit-content;
+      margin: 0 auto 2rem;
+      background-color: #8e44ad;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .create-btn:hover {
+      background-color: #732d91;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #eee;
+      color: #333;
+    }
+
+    .action-links a {
+      margin-right: 1rem;
+      color: #8e44ad;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .action-links a:hover {
+      text-decoration: underline;
+    }
+
+    /* Form Styling */
+    #form-row {
+      display: none;
+    }
+
+    .form-action {
+      background: linear-gradient(45deg, #8e44ad, #9b59b6);
+      padding: 0.75rem 1.5rem;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .form-action:hover {
+      background: linear-gradient(45deg, #732d91, #8e44ad);
+      transform: scale(1.05);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .create-btn {
+        font-size: 1rem;
+        padding: 0.75rem 1.5rem;
+      }
+
+      table th, table td {
+        padding: 0.75rem;
+      }
+
+      .form-action {
+        font-size: 0.875rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <%- include('partials/nav') %>
+
+  <div class="departments-container">
+    <h2>Departments</h2>
+    <!-- Button to show Add New Department form -->
+    <button class="create-btn" onclick="showForm('add')">Add New Department</button>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Address</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% departments.forEach(dep => { %>
+          <tr>
+            <td><%= dep.name %></td>
+            <td><%= dep.address %></td>
+            <td class="action-links">
+              <a href="#" class="edit-btn" data-id="<%= dep._id %>" data-name="<%= dep.name %>" data-address="<%= dep.address %>">Edit</a>
+              <form method="POST" action="/departments/delete/<%= dep._id %>" style="display:inline;">
+                <button type="submit" style="background:none; border:none; color:#8e44ad; text-decoration: underline; font-weight: bold;">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+
+        <!-- Hidden Form Row -->
+        <tr id="form-row">
+          <form id="department-form" method="POST">
+            <td><input type="text" name="name" id="form-name" required></td>
+            <td><input type="text" name="address" id="form-address" required></td>
+            <td><button type="submit" class="form-action" id="form-button">Submit</button></td>
+          </form>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Function to show the form for Add or Edit
+    function showForm(action) {
+      const formRow = document.getElementById('form-row');
+      const form = document.getElementById('department-form');
+      const nameInput = document.getElementById('form-name');
+      const addressInput = document.getElementById('form-address');
+      const formButton = document.getElementById('form-button');
+
+      formRow.style.display = 'table-row';
+      nameInput.value = '';
+      addressInput.value = '';
+      form.action = '/departments/add';
+      formButton.textContent = 'Add Department';
+    }
+
+    // Edit department
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = e.target.dataset.id;
+        const name = e.target.dataset.name;
+        const address = e.target.dataset.address;
+
+        const formRow = document.getElementById('form-row');
+        const form = document.getElementById('department-form');
+        const nameInput = document.getElementById('form-name');
+        const addressInput = document.getElementById('form-address');
+        const formButton = document.getElementById('form-button');
+
+        formRow.style.display = 'table-row';
+        nameInput.value = name;
+        addressInput.value = address;
+        form.action = '/departments/edit/' + id;
+        formButton.textContent = 'Update Department';
+      });
+    });
+  </script>
+</body>
+</html>

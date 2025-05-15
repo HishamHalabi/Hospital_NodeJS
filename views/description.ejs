@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Descriptions</title>
+  <style>
+    body {
+      background: linear-gradient(to right, #fbc2eb, #a6c1ee);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 4rem auto;
+      padding: 2rem;
+      background: #ffffffdd;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(8px);
+    }
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 2rem;
+    }
+
+    .create-btn {
+      background-color: #8e44ad;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s ease;
+      display: block;
+      margin: 0 auto 2rem;
+    }
+
+    .create-btn:hover {
+      background-color: #732d91;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    th, td {
+      padding: 1rem;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+
+    th {
+      background-color: #eee;
+      color: #333;
+    }
+
+    .action-links {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .edit-btn {
+      background: #3498db;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .edit-btn:hover {
+      background: #2980b9;
+    }
+
+    .delete-btn {
+      background: #e74c3c;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .delete-btn:hover {
+      background: #c0392b;
+    }
+
+    #form-row {
+      display: none;
+    }
+
+    select, input[type="text"] {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .form-action {
+      background: linear-gradient(45deg, #8e44ad, #9b59b6);
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .form-action:hover {
+      background: linear-gradient(45deg, #732d91, #8e44ad);
+    }
+  </style>
+</head>
+<body>
+  <%- include('partials/nav') %>
+
+  <div class="container">
+    <h2>Patient Descriptions</h2>
+
+    <button class="create-btn" onclick="showForm('add')">Add Description</button>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Patient</th>
+          <th>Doctor</th>
+          <th>Diagnosis</th>
+          <th>Department</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% descriptions.forEach(function(description) { %>
+          <tr>
+            <td><%= description.patient?.name || 'N/A' %></td>
+            <td><%= description.doctor?.name || 'N/A' %></td>
+            <td><%= description.diagnosis %></td>
+            <td><%= description.department?.name || 'N/A' %></td>
+            <td class="action-links">
+              <a href="#" class="edit-btn" 
+                 data-id="<%= description._id %>" 
+                 data-patient="<%= description.patient?._id %>" 
+                 data-doctor="<%= description.doctor?._id %>" 
+                 data-department="<%= description.department?._id %>" 
+                 data-diagnosis="<%= description.diagnosis %>">
+                 Edit
+              </a>
+              <form method="POST" action="/descriptions/delete/<%= description._id %>" style="display:inline;">
+                <button type="submit" class="delete-btn">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+
+        <!-- Form Row -->
+        <tr id="form-row">
+          <form id="description-form" method="POST">
+            <td>
+              <select name="patient" id="form-patient" required>
+                <option value="">-- Select Patient --</option>
+                <% patients.forEach(p => { %>
+                  <option value="<%= p._id %>"><%= p.name %></option>
+                <% }) %>
+              </select>
+            </td>
+            <td>
+              <select name="doctor" id="form-doctor" required>
+                <option value="">-- Select Doctor --</option>
+                <% doctors.forEach(d => { %>
+                  <option value="<%= d._id %>"><%= d.name %></option>
+                <% }) %>
+              </select>
+            </td>
+            <td><input type="text" name="diagnosis" id="form-diagnosis" required /></td>
+            <td>
+              <select name="department" id="form-department" required>
+                <option value="">-- Select Department --</option>
+                <% departments.forEach(dep => { %>
+                  <option value="<%= dep._id %>"><%= dep.name %></option>
+                <% }) %>
+              </select>
+            </td>
+            <td><button type="submit" class="form-action" id="form-button">Submit</button></td>
+          </form>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    function showForm(action) {
+      const formRow = document.getElementById('form-row');
+      const form = document.getElementById('description-form');
+      const formButton = document.getElementById('form-button');
+
+      document.getElementById('form-patient').value = '';
+      document.getElementById('form-doctor').value = '';
+      document.getElementById('form-diagnosis').value = '';
+      document.getElementById('form-department').value = '';
+      
+      formRow.style.display = 'table-row';
+      form.action = '/descriptions/add';
+      formButton.textContent = 'Add Description';
+    }
+
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        const { id, patient, doctor, diagnosis, department } = btn.dataset;
+        const formRow = document.getElementById('form-row');
+        const form = document.getElementById('description-form');
+
+        document.getElementById('form-patient').value = patient;
+        document.getElementById('form-doctor').value = doctor;
+        document.getElementById('form-diagnosis').value = diagnosis;
+        document.getElementById('form-department').value = department;
+
+        formRow.style.display = 'table-row';
+        form.action = '/descriptions/edit/' + id;
+        document.getElementById('form-button').textContent = 'Update Description';
+      });
+    });
+  </script>
+</body>
+</html>
